@@ -1,5 +1,7 @@
-﻿using ClearBank.DeveloperTest.Services;
+﻿using ClearBank.DeveloperTest.Interfaces;
+using ClearBank.DeveloperTest.Services;
 using ClearBank.DeveloperTest.Types;
+using Moq;
 using Xunit;
 
 namespace ClearBank.DeveloperTest.Tests
@@ -7,10 +9,13 @@ namespace ClearBank.DeveloperTest.Tests
     public class PaymentServiceTests
     {
         private readonly PaymentService _service;
+        private readonly Mock<IDataService> _mockDataService;
 
         public PaymentServiceTests()
         {
-            _service = new PaymentService();
+            _mockDataService = new Mock<IDataService>();
+
+            _service = new PaymentService(_mockDataService.Object);
         }
 
         [Theory]
@@ -20,7 +25,7 @@ namespace ClearBank.DeveloperTest.Tests
         {
             // Act
             var account = new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Bacs };
-            /// unable to mock account until we decouple the data store from the payment service
+            _mockDataService.Setup(x => x.GetAccount(It.IsAny<string>())).Returns(account);
 
             var request = new MakePaymentRequest { DebtorAccountNumber = "123", PaymentScheme = requestPaymentScheme };
 
@@ -40,7 +45,7 @@ namespace ClearBank.DeveloperTest.Tests
         {
             // Act
             var account = new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Chaps, Status = status };
-            /// unable to mock account until we decouple the data store from the payment service
+            _mockDataService.Setup(x => x.GetAccount(It.IsAny<string>())).Returns(account);
 
             var request = new MakePaymentRequest { DebtorAccountNumber = "123", PaymentScheme = requestPaymentScheme };
 
@@ -59,7 +64,7 @@ namespace ClearBank.DeveloperTest.Tests
         {
             // Act
             var account = new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.FasterPayments, Balance = balance };
-            /// unable to mock account until we decouple the data store from the payment service
+            _mockDataService.Setup(x => x.GetAccount(It.IsAny<string>())).Returns(account);
 
             var request = new MakePaymentRequest { DebtorAccountNumber = "123", PaymentScheme = requestPaymentScheme, Amount = requestAmount };
 
