@@ -13,3 +13,5 @@ PaymentScheme switch refactor to remove the long conditional.
 Create DataService to add a layer of abstraction between the PaymentService and AccountDataStore
 * DataService will ??
 
+Create Scheme factory to replace the switch section making the PaymentService cleaner and isolates the validation logic.
+* Easier to add new schemas and update existing ones.

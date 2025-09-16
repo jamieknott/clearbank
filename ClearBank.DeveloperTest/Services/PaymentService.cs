@@ -13,44 +13,26 @@ namespace ClearBank.DeveloperTest.Services
         }
         public MakePaymentResult MakePayment(MakePaymentRequest request)
         {
+            var result = new MakePaymentResult { Success = false };
             var account = _dataService.GetAccount(request.DebtorAccountNumber);
-
-            //if (dataStoreType == "Backup")
-            //{
-            //    var accountDataStore = new BackupAccountDataStore();
-            //    account = accountDataStore.GetAccount(request.DebtorAccountNumber);
-            //}
-            //else
-            //{
-            //    var accountDataStore = new AccountDataStore();
-            //    account = accountDataStore.GetAccount(request.DebtorAccountNumber);
-            //}
-
-            var result = new MakePaymentResult();
-
-            result.Success = true;
+            if (account == null)
+            {
+                return result;
+            }
             
             switch (request.PaymentScheme)
             {
                 case PaymentScheme.Bacs:
-                    if (account == null)
+                    if (account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.Bacs))
                     {
-                        result.Success = false;
-                    }
-                    else if (!account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.Bacs))
-                    {
-                        result.Success = false;
+                        result.Success = true;
                     }
                     break;
 
                 case PaymentScheme.FasterPayments:
-                    if (account == null)
+                    if (account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.FasterPayments))
                     {
-                        result.Success = false;
-                    }
-                    else if (!account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.FasterPayments))
-                    {
-                        result.Success = false;
+                        result.Success = true;
                     }
                     else if (account.Balance < request.Amount)
                     {
@@ -59,13 +41,9 @@ namespace ClearBank.DeveloperTest.Services
                     break;
 
                 case PaymentScheme.Chaps:
-                    if (account == null)
+                    if (account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.Chaps))
                     {
-                        result.Success = false;
-                    }
-                    else if (!account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.Chaps))
-                    {
-                        result.Success = false;
+                        result.Success = true;
                     }
                     else if (account.Status != AccountStatus.Live)
                     {
@@ -77,17 +55,6 @@ namespace ClearBank.DeveloperTest.Services
             if (result.Success)
             {
                 account.Balance -= request.Amount;
-
-                //if (dataStoreType == "Backup")
-                //{
-                //    var accountDataStore = new BackupAccountDataStore();
-                //    accountDataStore.UpdateAccount(account);
-                //}
-                //else
-                //{
-                //    var accountDataStore = new AccountDataStore();
-                //    accountDataStore.UpdateAccount(account);
-                //}
 
                 _dataService.UpdateAccount(account);
             }
