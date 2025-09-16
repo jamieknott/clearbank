@@ -1,4 +1,5 @@
-﻿using ClearBank.DeveloperTest.Interfaces;
+﻿using ClearBank.DeveloperTest.Factories;
+using ClearBank.DeveloperTest.Interfaces;
 using ClearBank.DeveloperTest.Services;
 using ClearBank.DeveloperTest.Types;
 using Moq;
@@ -9,16 +10,15 @@ namespace ClearBank.DeveloperTest.Tests
     public class PaymentServiceTests
     {
         private readonly Mock<IDataService> _mockDataService;
-        private readonly Mock<IPaymentSchemeFactory> _mockPaymentSchemeFactory;
 
         private readonly PaymentService _service;
 
         public PaymentServiceTests()
         {
             _mockDataService = new Mock<IDataService>();
-            _mockPaymentSchemeFactory = new Mock<IPaymentSchemeFactory>();
 
-            _service = new PaymentService(_mockDataService.Object, _mockPaymentSchemeFactory.Object);
+            var _paymentSchemeFactory = new PaymentSchemeFactory();
+            _service = new PaymentService(_mockDataService.Object, _paymentSchemeFactory);
         }
 
         [Theory]
