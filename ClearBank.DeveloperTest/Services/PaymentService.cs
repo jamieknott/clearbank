@@ -6,10 +6,12 @@ namespace ClearBank.DeveloperTest.Services
     public class PaymentService : IPaymentService
     {
         private readonly IDataService _dataService;
+        private readonly IPaymentSchemeFactory _paymentSchemeFactory;
 
-        public PaymentService(IDataService dataService)
+        public PaymentService(IDataService dataService, IPaymentSchemeFactory paymentSchemeFactory)
         {
             _dataService = dataService;
+            _paymentSchemeFactory = paymentSchemeFactory;
         }
         public MakePaymentResult MakePayment(MakePaymentRequest request)
         {
@@ -19,44 +21,14 @@ namespace ClearBank.DeveloperTest.Services
             {
                 return result;
             }
-            
-            switch (request.PaymentScheme)
-            {
-                case PaymentScheme.Bacs:
-                    if (account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.Bacs))
-                    {
-                        result.Success = true;
-                    }
-                    break;
 
-                case PaymentScheme.FasterPayments:
-                    if (account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.FasterPayments))
-                    {
-                        result.Success = true;
-                    }
-                    else if (account.Balance < request.Amount)
-                    {
-                        result.Success = false;
-                    }
-                    break;
+            var scheme = _paymentSchemeFactory.GetScheme(request.PaymentScheme);
 
-                case PaymentScheme.Chaps:
-                    if (account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.Chaps))
-                    {
-                        result.Success = true;
-                    }
-                    else if (account.Status != AccountStatus.Live)
-                    {
-                        result.Success = false;
-                    }
-                    break;
-            }
-
-            if (result.Success)
+            if (scheme.IsValid(account, request))
             {
                 account.Balance -= request.Amount;
-
                 _dataService.UpdateAccount(account);
+                result.Success = true;
             }
 
             return result;

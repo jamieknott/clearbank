@@ -3,9 +3,10 @@ using ClearBank.DeveloperTest.Types;
 
 namespace ClearBank.DeveloperTest.Schemes
 {
-    public class BacsPaymentScheme : IPaymentScheme
+    public class ChapsPaymentScheme : IPaymentScheme
     {
         public bool IsValid(Account account, MakePaymentRequest request) =>
-            account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.Bacs);
+            account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.Chaps) &&
+            account.Status == AccountStatus.Live;
     }
 }

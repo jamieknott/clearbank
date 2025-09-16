@@ -8,14 +8,17 @@ namespace ClearBank.DeveloperTest.Tests
 {
     public class PaymentServiceTests
     {
-        private readonly PaymentService _service;
         private readonly Mock<IDataService> _mockDataService;
+        private readonly Mock<IPaymentSchemeFactory> _mockPaymentSchemeFactory;
+
+        private readonly PaymentService _service;
 
         public PaymentServiceTests()
         {
             _mockDataService = new Mock<IDataService>();
+            _mockPaymentSchemeFactory = new Mock<IPaymentSchemeFactory>();
 
-            _service = new PaymentService(_mockDataService.Object);
+            _service = new PaymentService(_mockDataService.Object, _mockPaymentSchemeFactory.Object);
         }
 
         [Theory]

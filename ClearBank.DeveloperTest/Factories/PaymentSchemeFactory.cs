@@ -10,6 +10,8 @@ namespace ClearBank.DeveloperTest.Factories
         public IPaymentScheme GetScheme(PaymentScheme scheme) => scheme switch
         {
             PaymentScheme.Bacs => new BacsPaymentScheme(),
+            PaymentScheme.Chaps => new ChapsPaymentScheme(),
+            PaymentScheme.FasterPayments => new FasterPaymentsScheme(),
             _ => throw new NotSupportedException($"Unsupported payment scheme: {scheme}")
         };
     }
