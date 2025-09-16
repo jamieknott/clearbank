@@ -21,3 +21,14 @@ Create Scheme factory to replace the switch section making the PaymentService cl
 * Easier to add new schemas and update existing ones.
 
 ### FINAL NOTES
+DataStore
+* Config driven DI instead of picking appSettings directly.
+	* Initialise the DataStore in Startup
+* Balance should be updated if all steps in a transaction succeed.
+	* Right now if this was a live system if it was to crash there's a chance someone could be creditored without balance being reducted. BAD.
+	* If any steps fail, account should be rolled back.
+
+Tests
+* Integration tests testing the e2e journey of the PaymentService.
+	* Would allow to test a fully successful, or force a failure in a transaction as mentioned above.
+* Could've split the tests out and moved the scheme specific tests to a Factory test file.
