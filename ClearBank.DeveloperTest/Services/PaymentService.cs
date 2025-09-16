@@ -27,6 +27,11 @@ namespace ClearBank.DeveloperTest.Services
             }
 
             var scheme = _paymentSchemeFactory.GetScheme(request.PaymentScheme);
+            if (scheme == null)
+            {
+                _logger.LogError("No scheme found for payment scheme {scheme}.", request.PaymentScheme);
+                return result;
+            }
 
             if (scheme.IsValid(account, request))
             {

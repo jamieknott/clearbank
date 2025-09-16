@@ -27,6 +27,37 @@ namespace ClearBank.DeveloperTest.Tests
             );
         }
 
+        [Fact]
+        public void MakePayment_ReturnsFailure()
+        {
+            // Act
+            _mockDataService.Setup(x => x.GetAccount(It.IsAny<string>())).Returns((Account)null);
+
+            // Arrange
+            var result = _service.MakePayment(new MakePaymentRequest());
+
+            // Assert
+            Assert.False(result.Success);
+        }
+
+        [Fact]
+        public void MakePayment_ReturnsSuccess()
+        {
+            // Arrange
+            var account = new Account { AccountNumber = "123", Balance = 100, AllowedPaymentSchemes = AllowedPaymentSchemes.Bacs };
+            _mockDataService.Setup(x => x.GetAccount(It.IsAny<string>())).Returns(account);
+
+            var request = new MakePaymentRequest { DebtorAccountNumber = "123", PaymentScheme = PaymentScheme.Bacs, Amount = 50 };
+
+            // Act
+            var result = _service.MakePayment(request);
+
+            // Assert
+            Assert.True(result.Success);
+            Assert.Equal(50, account.Balance);
+            _mockDataService.Verify(x => x.UpdateAccount(account), Times.Once);
+        }
+
         [Theory]
         [InlineData(PaymentScheme.Bacs, true)]
         [InlineData(PaymentScheme.Chaps, false)]
