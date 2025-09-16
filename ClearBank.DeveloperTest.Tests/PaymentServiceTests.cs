@@ -1,7 +1,9 @@
-﻿using ClearBank.DeveloperTest.Factories;
+﻿using Castle.Core.Logging;
+using ClearBank.DeveloperTest.Factories;
 using ClearBank.DeveloperTest.Interfaces;
 using ClearBank.DeveloperTest.Services;
 using ClearBank.DeveloperTest.Types;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -18,7 +20,11 @@ namespace ClearBank.DeveloperTest.Tests
             _mockDataService = new Mock<IDataService>();
 
             var _paymentSchemeFactory = new PaymentSchemeFactory();
-            _service = new PaymentService(_mockDataService.Object, _paymentSchemeFactory);
+            _service = new PaymentService(
+                _mockDataService.Object,
+                _paymentSchemeFactory,
+                new Mock<ILogger<PaymentService>>().Object
+            );
         }
 
         [Theory]
